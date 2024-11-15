@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ストレス度チェック</title>
+  <style>
+    /* 基本設定 */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f6e7;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+    }
+    .notebook {
+      width: 80%;
+      max-width: 600px;
+      background-color: #fffdf7;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+      position: relative;
+      overflow: hidden;
+    }
+    .notebook::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 15px;
+      background-color: #f1f1f1;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header img {
+      max-width: 50%;
+      height: auto;
+    }
+    .question-section {
+      text-align: center;
+    }
+    .question {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+    .btnChoice {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .btnChoice .choice {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #fffae1;
+      border-radius: 5px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      transition: background-color 0.3s ease;
+    }
+    .btnChoice .choice:hover {
+      background-color: #f9eacb;
+    }
+    .pagination {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: #777;
+    }
+
+    /* 左下の小さなテキスト */
+    .bottom-left-text {
+      position: absolute;
+      left: 20px;
+      bottom: 10px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* 右下に画像 */
+    .bottom-right-img {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 80px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="notebook">
+    <!-- 画像を見出しとして表示 -->
+    <div class="header">
+      <img src="見出し.png" alt="ストレス度チェック" id="headerImage" />
+    </div>
+
+    <div class="question-section">
+      <p class="question">Q1. 最近、どのくらいストレスを感じていますか？</p>
+      <ul class="btnChoice">
+        <li><span class="choice" data-choice="1">全く感じていない</span></li>
+        <li><span class="choice" data-choice="2">少し感じる</span></li>
+        <li><span class="choice" data-choice="3">やや感じる</span></li>
+        <li><span class="choice" data-choice="4">非常に感じる</span></li>
+      </ul>
+    </div>
+    <div class="pagination">1 / 20</div>
+
+    <!-- 左下のテキスト -->
+    <div class="bottom-left-text">
+      あなたの心に思う回答を期待し、戻ることを拒否します。
+    </div>
+
+    <!-- 右下の画像 -->
+    <img src="傷ついたハート.jpg" alt="右下の画像" class="bottom-right-img" />
+  </div>
+
+  <script>
+    const questions = [
+      "最近、どのくらいストレスを感じていますか",
+      "職場や学校での人間関係にストレスを感じますか",
+      "睡眠の質に満足していますか",
+      "最近、仕事や学校でプレッシャーを感じることが多いですか",
+      "日常生活で気分が落ち込むことが多いと感じられますか",
+      "最近、身体的に疲れやすいと感じますか",
+      "食欲に変化があったと感じますか",
+      "世界を憎んでいますか",
+      // 他の質問も追加可能
+    ];
+    let currentQuestionIndex = 0;
+
+    // 保存された回答をロード
+    const loadAnswers = () => JSON.parse(localStorage.getItem('stressCheckAnswers') || '[]');
+    let answers = loadAnswers();
+
+    // 回答を保存する関数
+    const saveAnswer = (questionIndex, choice) => {
+      answers[questionIndex] = choice;
+      localStorage.setItem('stressCheckAnswers', JSON.stringify(answers));
+    };
+
+    // 質問と進行状況の更新
+    const updateQuestion = () => {
+  document.querySelector('.question').innerText = `Q${currentQuestionIndex + 1}. ${questions[currentQuestionIndex]}にゃ`;
+  document.querySelector('.pagination').innerText = `${currentQuestionIndex + 1} / ${questions.length}`;
+};
+
+    document.querySelectorAll('.choice').forEach(choice => {
+      choice.addEventListener('click', function() {
+        const choiceValue = this.getAttribute('data-choice');
+        saveAnswer(currentQuestionIndex, choiceValue);
+
+        // 次の質問に進む
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+          updateQuestion();
+        } else {
+          document.querySelector('.notebook').innerHTML = "<h2>ありがとうございました！</h2><p>結果は追々、通知します。</p>";
+        }
+      });
+    });
+
+    // 最初の質問を表示
+    updateQuestion();
+    // 質問と進行状況の更新
+  </script>
+</body>
+</html>
